@@ -1,0 +1,14 @@
+#!/bin/bash
+
+ENVCONSUL_VERSION=0.6.1
+
+apt-get update
+apt-get install -y curl unzip net-tools netcat
+curl -L -o ./consul.zip https://releases.hashicorp.com/envconsul/${ENVCONSUL_VERSION}/envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip
+unzip ./consul.zip
+cp ./envconsul /usr/local/bin
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* *.gz
+
+curl -sL https://deb.nodesource.com/setup_4.x | bash -
+apt-get install -y nodejs
