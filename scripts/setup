@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ENVCONSUL_VERSION=0.6.1
+PHANTOM_JS_VERSION=1.9.8-linux-x86_64
 
 apt-get update
 apt-get install -y curl unzip net-tools netcat
@@ -12,3 +13,6 @@ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* *.gz
 
 curl -sL https://deb.nodesource.com/setup_4.x | bash -
 apt-get install -y nodejs
+
+curl -sSL https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-$PHANTOM_JS_VERSION.tar.bz2 | tar xjC /
+ln -s /phantomjs-$PHANTOM_JS_VERSION/bin/phantomjs /usr/local/bin/
