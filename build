@@ -14,19 +14,19 @@ WORKDIR /app
 COPY scripts/run /scripts/run
 ENTRYPOINT ["/scripts/run"]
 EOF
-  docker build $2 -t ruby-consul:$1 -f Dockerfile .
+  docker build $3 -t $2:$1 -f Dockerfile .
   rm Dockerfile
 }
 
 build-rails() {
   echo -e "\nBuilding $1-rails"
   cat > Dockerfile-rails <<EOF
-FROM ruby-consul:$1
+FROM $2:$1
 
 COPY scripts/run-rails /scripts/run-rails
 ENTRYPOINT ["/scripts/run-rails"]
 EOF
-  docker build $2 -t ruby-consul:$1-rails -f Dockerfile-rails .
+  docker build $3 -t $2:$1-rails -f Dockerfile-rails .
   rm Dockerfile-rails
 }
 
@@ -35,6 +35,10 @@ while [[ $# -gt 1 ]]; do
   case $key in
     -v|--versions)
       versions="$2"
+      shift
+      ;;
+    -t|--tag)
+      tag="$2"
       shift
       ;;
   esac
@@ -51,6 +55,6 @@ fi
 
 build_options="$@"
 for i in ${versions[@]}; do
-  build $i $build_options
-  build-rails $i $build_options
+  build $i $tag $build_options
+  build-rails $i $tag $build_options
 done
