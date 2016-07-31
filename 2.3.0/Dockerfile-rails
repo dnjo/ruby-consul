@@ -1,0 +1,4 @@
+FROM ruby-consul:2.3.0
+
+COPY scripts/run-rails /scripts/run-rails
+ENTRYPOINT ["/scripts/run-rails"]
