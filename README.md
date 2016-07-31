@@ -1,4 +1,4 @@
-# ruby-consul
+# ruby-envconsul
 
 Example using docker-compose:
 ```
