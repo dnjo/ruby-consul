@@ -6,7 +6,7 @@ version: '2'
 
 services:
   rails_app:
-    image: ruby-consul:2.3.0-rails
+    image: dnjo/ruby-envconsul:2.3.0-rails
     command: rails
     container_name: rails_app
     ports:
