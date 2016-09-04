@@ -1,7 +1,7 @@
 #!/bin/bash
 
 build() {
-  echo -e "\nBuilding $1"
+  echo -e "\nBuilding $1..."
   cat > Dockerfile <<EOF
 FROM ruby:$1
 
@@ -14,19 +14,30 @@ WORKDIR /app
 COPY scripts/run /scripts/run
 ENTRYPOINT ["/scripts/run"]
 EOF
-  docker build $3 -t $2:$1 -f Dockerfile .
+  docker build $3 -t $2:$1 -f Dockerfile . > $1.log
+  result=$?
   rm Dockerfile
+  if [ $result -eq 0 ]; then
+    echo "Successfully built $1"
+  else
+    echo "Failed to build $1"
+    false
+  fi
 }
 
 build-rails() {
-  echo -e "\nBuilding $1-rails"
+  echo -e "\nBuilding $1-rails..."
   cat > Dockerfile-rails <<EOF
 FROM $2:$1
 
 COPY scripts/run-rails /scripts/run-rails
 ENTRYPOINT ["/scripts/run-rails"]
 EOF
-  docker build $3 -t $2:$1-rails -f Dockerfile-rails .
+  if docker build $3 -t $2:$1-rails -f Dockerfile-rails . > $1-rails.log; then
+    echo "Successfully built $1-rails"
+  else
+    echo "Failed to build $1-rails"
+  fi
   rm Dockerfile-rails
 }
 
@@ -55,6 +66,7 @@ fi
 
 build_options="$@"
 for i in ${versions[@]}; do
-  build $i $tag $build_options
-  build-rails $i $tag $build_options
+  if build $i $tag $build_options; then
+    build-rails $i $tag $build_options
+  fi
 done

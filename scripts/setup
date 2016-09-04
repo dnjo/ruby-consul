@@ -3,18 +3,38 @@
 ENVCONSUL_VERSION=0.6.1
 PHANTOM_JS_VERSION=2.1.1-linux-x86_64
 
-apt-get update
-apt-get install -y curl unzip net-tools netcat
-curl -L -o ./consul.zip https://releases.hashicorp.com/envconsul/${ENVCONSUL_VERSION}/envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip
-unzip ./consul.zip
-cp ./envconsul /usr/local/bin
-apt-get clean
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* *.gz
+install_envconsul() {
+  apt-get update &&
+    apt-get install -y curl unzip net-tools netcat &&
+    curl -L -o ./consul.zip https://releases.hashicorp.com/envconsul/${ENVCONSUL_VERSION}/envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip &&
+    unzip ./consul.zip &&
+    rm ./consul.zip &&
+    mv ./envconsul /usr/local/bin &&
+    apt-get clean &&
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* *.gz
+}
 
-curl -sL https://deb.nodesource.com/setup_4.x | bash -
-apt-get install -y nodejs
+install_node() {
+  curl -sL https://deb.nodesource.com/setup_4.x | bash - &&
+    apt-get install -y nodejs
+}
 
-curl -sSL https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-$PHANTOM_JS_VERSION.tar.bz2 | tar xjC /
-ln -s /phantomjs-$PHANTOM_JS_VERSION/bin/phantomjs /usr/local/bin/
+install_phantomjs() {
+  curl -sSL https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-$PHANTOM_JS_VERSION.tar.bz2 | tar xjC / &&
+    ln -s /phantomjs-$PHANTOM_JS_VERSION/bin/phantomjs /usr/local/bin/
+}
 
-gem update bundler
+update_bundler() {
+  gem update bundler
+}
+
+setup() {
+  install_phantomjs &&
+    install_envconsul &&
+    install_node &&
+    update_bundler
+}
+
+if ! setup; then
+  exit 1
+fi
