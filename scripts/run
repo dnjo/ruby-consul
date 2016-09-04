@@ -6,6 +6,10 @@ else
   log_level=warn
 fi
 
+if [ -d /ssh_keys ]; then
+  cp -Rf /ssh_keys ~/.ssh
+fi
+
 /usr/local/bin/envconsul \
   -sanitize \
   -upcase \
