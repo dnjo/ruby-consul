@@ -1,5 +1,17 @@
 #!/bin/bash
 
+if [ -z $RBENV_VERSION ]; then
+  if [ -f .ruby-version ]; then
+    RBENV_VERSION=$(cat .ruby-version)
+  else
+    echo "RBENV_VERSION not set and no .ruby-version file exists. Exiting."
+    exit 1
+  fi
+fi
+
+source ~/.bashrc
+rbenv install -s $RBENV_VERSION
+
 if [ ! -z $CONSUL_LOG_LEVEL ]; then
   log_level=$CONSUL_LOG_LEVEL
 else

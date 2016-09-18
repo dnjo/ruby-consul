@@ -1,72 +1,12 @@
 #!/bin/bash
 
 build() {
-  echo -e "\nBuilding $1..."
-  cat > Dockerfile <<EOF
-FROM ruby:$1
-
-COPY scripts/setup /scripts/setup
-RUN /scripts/setup
-
-RUN mkdir /app
-WORKDIR /app
-
-COPY scripts/run /scripts/run
-ENTRYPOINT ["/scripts/run"]
-EOF
-  docker build $3 -t $2:$1 -f Dockerfile . > $1.log
-  result=$?
-  rm Dockerfile
-  if [ $result -eq 0 ]; then
-    echo "Successfully built $1"
-  else
-    echo "Failed to build $1"
-    false
-  fi
+  docker build -t dnjo/ruby-envconsul .
 }
 
 build-rails() {
-  echo -e "\nBuilding $1-rails..."
-  cat > Dockerfile-rails <<EOF
-FROM $2:$1
-
-COPY scripts/run-rails /scripts/run-rails
-ENTRYPOINT ["/scripts/run-rails"]
-EOF
-  if docker build $3 -t $2:$1-rails -f Dockerfile-rails . > $1-rails.log; then
-    echo "Successfully built $1-rails"
-  else
-    echo "Failed to build $1-rails"
-  fi
-  rm Dockerfile-rails
+  docker build -t dnjo/ruby-envconsul:rails -f Dockerfile-rails .
 }
 
-while [[ $# -gt 1 ]]; do
-  key="$1"
-  case $key in
-    -v|--versions)
-      versions="$2"
-      shift
-      ;;
-    -t|--tag)
-      tag="$2"
-      shift
-      ;;
-  esac
-  shift
-done
-
-if [[ ! -z $versions ]]; then
-  versions=($versions)
-else
-  echo "Usage: build --versions [VERSIONS] [BUILD OPTIONS]"
-  echo "Example: build --versions \"2.1.5 2.3.0\" --no-cache"
-  exit 1
-fi
-
-build_options="$@"
-for i in ${versions[@]}; do
-  if build $i $tag $build_options; then
-    build-rails $i $tag $build_options
-  fi
-done
+build &&
+  build-rails

@@ -1,0 +1,4 @@
+FROM dnjo/ruby-envconsul
+
+COPY scripts/run-rails /scripts/run-rails
+ENTRYPOINT ["/scripts/run-rails"]
