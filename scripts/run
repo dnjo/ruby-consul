@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# rbenv install echos enough by itself
 if [ -z $RBENV_VERSION ]; then
   if [ -f .ruby-version ]; then
     RBENV_VERSION=$(cat .ruby-version)
@@ -8,22 +9,31 @@ if [ -z $RBENV_VERSION ]; then
     exit 1
   fi
 fi
-
 source ~/.bashrc
-rbenv install -s $RBENV_VERSION
+installed=`rbenv versions 2>&1 | grep $RBENV_VERSION | grep -v 'not installed'|wc -l|tr -d '[:space:]'`
+if [ $installed -ne '1' ]; then
+  rbenv install -s $RBENV_VERSION
+fi
 
+echo "Installing bundler & gems"
+gem install bundler
+bundle install
+
+echo "Setting Consul Log Level"
 if [ ! -z $CONSUL_LOG_LEVEL ]; then
   log_level=$CONSUL_LOG_LEVEL
 else
   log_level=warn
 fi
 
+echo "Configuring SSH Keys"
 if [ -d /ssh_keys ]; then
   cp -Rf /ssh_keys ~/.ssh
   eval "$(ssh-agent)" > /dev/null 2>&1
   ssh-add > /dev/null 2>&1
 fi
 
+echo "Starting envconsul"
 /usr/local/bin/envconsul \
   -sanitize \
   -upcase \
